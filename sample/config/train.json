@@ -1,0 +1,6 @@
+{
+
+    "train_file": "data/ArchiveII-KFold/common/fold_4_train.csv",
+    "valid_file": "data/ArchiveII-KFold/common/fold_4_val.csv",
+    "out_path": "results/ArchiveII-KFold/common/fold_4"
+}

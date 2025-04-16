@@ -1,0 +1,14 @@
+{
+    "exp": "plain_kfold_100e",
+    "run": "fold_4",
+    "device": "cpu",
+    "cache_path": "cache/",
+    "batch_size": 4,
+    "max_len": 128, 
+    "quiet": false,
+    "nworkers": 4,
+    "max_epochs": 100,
+    "valid_split": 0.1,
+    "verbose": true
+}
+

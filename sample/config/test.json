@@ -1,0 +1,5 @@
+{
+    "test_file": "data/ArchiveII-KFold/common/fold_4_test.csv",
+    "model_weights": "results/ArchiveII-KFold/common/fold_4/weights.pmt",
+    "out_path": "results/ArchiveII-KFold/common/fold_4/testlog_4.csv"
+}

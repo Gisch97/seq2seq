@@ -1,0 +1,15 @@
+{
+    "exp": "tiny_Unet_noise_exp3",
+    "run": "nc-2-n4-2-n8-2-skip1-0",
+    "device": "cuda",
+    "cache_path": "cache/",
+    "batch_size": 64,
+    "max_len": 128, 
+    "swaps": 0,
+    "quiet": false,
+    "nworkers": 4,
+    "max_epochs": 20,
+    "valid_split": 0.1,
+    "verbose": true
+}
+

@@ -1,0 +1,23 @@
+name: seq2seq
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+  - nvidia
+dependencies:
+  - python=3.9
+  - pip
+  - pytorch=2.1
+  - pytorch-cuda=12.1 
+  - pandas=2.0.2
+  - numpy=1.24.2
+  - scikit-learn=1.2.1
+  - tqdm=4.64.1
+  - ipykernel
+  - mlflow
+  - lightning
+  - pygments
+  - jupyter
+pip:
+    - hatchling
+    - seq2seq
