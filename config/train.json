@@ -2,5 +2,5 @@
 
     "train_file": "data/ArchiveII/seq-similarity/train_0.csv",
     "valid_file": "data/ArchiveII/seq-similarity/valid_0.csv",
-    "out_path": "results/UNet_selection/tiny_Unet_noise_exp3/nc-2-n4-2-n8-2-skip1"
+    "out_path": "results/test0"
 }

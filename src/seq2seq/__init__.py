@@ -63,8 +63,8 @@ def main():
     random.seed(42)
     np.random.seed(42)
      
-    mlflow.set_tracking_uri("sqlite:///mlruns.db")
-    artifact_location = "mlruns/artifacts"
+    mlflow.set_tracking_uri("sqlite:///results/mlflow/mlruns.db")
+    artifact_location = "results/mlflow/mlruns/artifacts"
 
     try:
         mlflow.create_experiment(final_config["exp"], artifact_location=artifact_location )
@@ -271,7 +271,6 @@ def pred(pred_input, sequence_id='pred_id', model_weights=None, out_path=None, l
         else:
             raise ValueError(f"Invalid input nt {set(pred_input)}, either the file is missing or the secuence have invalid nucleotides (should be any of {nt_set})")
         
-    # pad_batch_with_fixed_length = partial(pad_batch, fixed_length=args.max_len) 
     pad_batch_with_fixed_length = partial(pad_batch, fixed_length=128)
     pred_loader = DataLoader(
         SeqDataset(pred_file, for_prediction=True, **config),

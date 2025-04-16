@@ -3,7 +3,7 @@
 
 This is the development repository for AEseq2seq, a RNA autoencoder converting sequences into sequences, originally forked from the [sincFold](https://github.com/sinc-lab/sincFold) . For model tracking, MLflow is used, with a sqlite backend.
 ```bash
- mlflow ui --backend-store-uri sqlite:///mlruns.db --host 0.0.0.0 --port 5000
+ mlflow ui --backend-store-uri sqlite:///results/mlflow/mlruns.db --host 0.0.0.0 --port 5000
 ```
 
 
@@ -11,8 +11,8 @@ This is the development repository for AEseq2seq, a RNA autoencoder converting s
 
 You can clone the repository with:
 
-    git clone https://github.com/Gisch97/AEseq2seq.git
-    cd sincFold/
+    git clone https://github.com/Gisch97/seq2seq.git
+    cd seq2seq/
 
 and install with:
 
@@ -36,4 +36,4 @@ The usage of the seq2seq model has the following input priority:
 2. Input files
 3. Default inputs
 
-__vesion__ = 0.1
+__vesion__ = 0.2

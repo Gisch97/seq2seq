@@ -7,8 +7,8 @@ from tqdm import tqdm
 import mlflow
 import mlflow.pytorch
 from .conv_layers import N_Conv, UpBlock, DownBlock, OutConv
-from ...metrics import compute_metrics
-from ..._version import __version__
+from ..metrics import compute_metrics
+from .._version import __version__
 
 
 def seq2seq(weights=None, **kwargs):
