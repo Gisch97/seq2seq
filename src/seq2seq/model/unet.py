@@ -36,8 +36,9 @@ class Seq2Seq(nn.Module):
         device="cpu",
         lr=1e-3,
         scheduler="none", 
-        verbose=True, 
-        noise=False,
+        verbose=True,
+        train_noise=False,
+        test_noise=False,
         **kwargs,
     ):
         """Base instantiation of model"""
@@ -46,7 +47,8 @@ class Seq2Seq(nn.Module):
         self.device = device
         self.verbose = verbose
         self.config = kwargs
-        self.noise = noise
+        self.test_noise = test_noise
+        self.train_noise = train_noise
         self.hyperparameters = {
             "hyp_device": device,
             "hyp_lr": lr,
@@ -140,11 +142,8 @@ class Seq2Seq(nn.Module):
         )
         self.outc = OutConv(features[0], embedding_dim)
 
-    def forward(self, batch):
-        x = batch["embedding"].to(self.device)
-        if self.noise == True:
-            x = batch["embedding_with_noise"].to(self.device)
-
+    def forward(self, x):
+        x = x.to(self.device)
         x = self.inc(x)
         encoder_outputs = [x]
         for i, down in enumerate(self.down):
@@ -170,17 +169,21 @@ class Seq2Seq(nn.Module):
 
     def fit(self, loader):
         self.train()
-
+        
         metrics = {"loss": 0, "F1": 0, "Accuracy": 0, "Accuracy_seq": 0}
         if self.verbose:
             loader = tqdm(loader)
 
+        emb = "embedding"
+        if self.train_noise == True:
+            emb = "embedding_with_noise"
         for batch in loader:
             x = batch["embedding"].to(self.device)
+            x_model = batch[emb].to(self.device)         
             mask = batch["mask"].to(self.device) 
             
             self.optimizer.zero_grad()  # Cleaning cache optimizer
-            x_rec, _ = self(batch)
+            x_rec, _ = self(x_model)
             loss = self.loss_func(x_rec, x)
             metrics["loss"] += loss.item()
 
@@ -207,12 +210,16 @@ class Seq2Seq(nn.Module):
         if self.verbose:
             loader = tqdm(loader)
 
+        emb= "embedding"
+        if self.test_noise == True:
+            emb ="embedding_with_noise"
         with tr.no_grad():
             for batch in loader:
-
-                x = batch["embedding"].to(self.device) 
+                x = batch["embedding"].to(self.device)
+                x_model = batch[emb].to(self.device)
                 mask = batch["mask"].to(self.device) 
-                x_rec, z = self(batch)
+
+                x_rec, z = self(x_model)
                 loss = self.loss_func(x_rec, x)
                 metrics["loss"] += loss.item()
                 batch_metrics = compute_metrics(x_rec, x, mask)
@@ -241,7 +248,7 @@ class Seq2Seq(nn.Module):
                 embedding = batch["embedding"]
                 sequences = batch["sequence"]
                 lengths = batch["length"]
-                x_rec, z = self(batch)
+                x_rec, z = self(embedding)
 
                 for k in range(x_rec.shape[0]):
                     seq_len = lengths[k]

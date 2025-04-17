@@ -63,7 +63,7 @@ class SeqDataset(Dataset):
         self.swaps = swaps
         self.mode = mode
         
-
+        print(swaps)
     def __len__(self):
         return len(self.sequences)
 
@@ -90,7 +90,7 @@ class SeqDataset(Dataset):
                 "embedding": seq_emb,
                 "embedding_with_noise": embedding_with_noise,
             }
-
+            
             if self.cache is not None:
                 pickle.dump(item, open(cache, "wb"))
 

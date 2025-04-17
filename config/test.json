@@ -1,5 +1,6 @@
 {
     "test_file": "data/ArchiveII/seq-similarity/test_0.csv",
-    "model_weights": "results/UNet_selection/tiny_Unet_noise_exp3/nc-2-n4-2-n8-2-skip1/weights.pmt",
-    "out_path": "results/test0/test_n_swaps0.csv"
+    "model_weights": "results/test0/weights.pmt",
+    "out_path": "results/test0/test_swaps04.csv",
+    "test_swaps": 0
 }

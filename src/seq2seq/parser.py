@@ -8,15 +8,14 @@ def parser():
         epilog="webserver link | None",
     )
     parser.add_argument("--global_config", type=str, help="Path to the global configuration file")
-    parser.add_argument("-d", type=str, default="cpu", help="Device ('cpu' or 'cuda')")
-    parser.add_argument("-batch", type=int, default=4, help="Batch size for handling sequences")
-    parser.add_argument("-j", type=int, default=2, help="Number of parallel workers")
+    parser.add_argument("-device", type=str, default="cpu", help="Device ('cpu' or 'cuda')")
+    parser.add_argument("-batch_size", type=int, default=4, help="Batch size for handling sequences")
+    parser.add_argument("-nworkers", type=int, default=2, help="Number of parallel workers")
     parser.add_argument("--quiet", action="store_true", help="Quiet mode (default: False)") 
-    parser.add_argument("--max-length", type=int, help="Maximum sequence length to process (default: None") 
+    parser.add_argument("--max_len", type=int, help="Maximum sequence length to process (default: None") 
     parser.add_argument('--version', '-v', action='version', version='%(prog)s ' + __version__)
     parser.add_argument("--exp", type=str, default=None, help="Experiment name")
-    parser.add_argument("--run", type=str, default=None, help="Run name (default: none)")
-    parser.add_argument("--swaps", type=int, default=None, help="number of swaps in embedding (default: 0)")
+    parser.add_argument("--run", type=str, default=None, help="Run name (default: none)") 
     
 
     subparsers = parser.add_subparsers(
@@ -53,6 +52,9 @@ def parser():
         "--no-cache",
         action="store_true", help="Cache of data for training (default: cache is used)",
     )
+    parser_train.add_argument(
+        "-train_swaps", type=int, default=None, help="number of swaps in embedding (default: 0)"
+        )
     
     parser_train.add_argument("--train_config", type=str, help="Path to the train config file")
 
@@ -72,6 +74,9 @@ def parser():
         type=str, dest="out_path", 
         help="Output test metrics (default: only printed on the console)",
     )
+    parser_test.add_argument(
+        "-test_swaps", type=int, default=None, help="number of swaps in embedding (default: 0)"
+        )
     parser_test.add_argument("--test_config", type=str, help="Path to the test config file")
 
     # pred parser

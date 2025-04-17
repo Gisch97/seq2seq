@@ -27,11 +27,10 @@ def main():
 
     # Configuración global por defecto
     global_config = {
-        "device": args.d,
-        "batch_size": args.batch,
+        "device": args.device,
+        "batch_size": args.batch_size,
         "valid_split": 0.1,
         "max_len": 128,
-        "swaps":args.swaps,
         "verbose": not args.quiet,
         "cache_path": cache_path,
     }
@@ -47,9 +46,7 @@ def main():
 
     # Combinar defaults, configuración global y argumentos CLI (prioridad CLI)
     cli_args = {k: v for k, v in vars(args).items() if v is not None}
-    final_config = {**parser_defaults, **global_config, **cli_args}
-    if args.swaps is None:
-        args.swaps = global_config.get("swaps", 0)
+    final_config = {**parser_defaults, **global_config} #, **cli_args
 
     # Preparar directorio de caché si es necesario
     if final_config.get("cache_path"):
@@ -76,28 +73,28 @@ def main():
             mlflow.log_params(final_config)                      
             mlflow.log_param("train_file",args.train_file)
             mlflow.log_param("valid_file",args.valid_file)
-            mlflow.log_param("out_path",args.out_path) 
-            train(args.train_file, final_config, args.out_path,  args.valid_file, args.j)
+            mlflow.log_param("out_path",args.out_path)  
+            mlflow.log_param("train_swaps",args.train_swaps)
+            train(args.train_file, final_config, args.out_path,  args.valid_file, args.nworkers, args.train_swaps)
             
 
         if args.command == "test":
             read_test_file(args)
-            test(args.test_file, args.model_weights, args.out_path, args.swaps ,final_config, args.j)    
+            test(args.test_file, args.model_weights, args.out_path, args.test_swaps ,final_config, args.nworkers) 
             mlflow.log_params(final_config) 
             mlflow.log_param("test_file",args.test_file) 
             mlflow.log_param("out_path",args.out_path) 
-            mlflow.log_param("swaps",args.swaps)
+            mlflow.log_param("test_swaps",args.test_swaps)
 
         if args.command == "pred":
             read_pred_file(args)
-            pred(args.pred_file, model_weights=args.model_weights, out_path=args.out_path, logits=args.logits, config=final_config, nworkers=args.j, draw=args.draw, draw_resolution=args.draw_resolution)    
+            pred(args.pred_file, model_weights=args.model_weights, out_path=args.out_path, logits=args.logits, config=final_config, nworkers=args.nworkers, draw=args.draw, draw_resolution=args.draw_resolution)    
  
-def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, verbose=True):
+def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, train_swaps=0, verbose=True):
     if out_path is None:
         out_path = f"results_{str(datetime.today()).replace(' ', '-')}/"
     else:
         out_path = out_path
-
     if verbose:
         print("Working on", out_path)
 
@@ -122,23 +119,26 @@ def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, ver
         val_data.to_csv(valid_file, index=False)
         data.drop(val_data.index).to_csv(train_file, index=False)
     
-    
-    # pad_batch_with_fixed_length = partial(pad_batch, fixed_length=args.max_len) 
     pad_batch_with_fixed_length = partial(pad_batch, fixed_length=128)
     batch_size = config["batch_size"] if "batch_size" in config else 4
-    train_loader = DataLoader(
-        SeqDataset(train_file, training=True, **config),
-        batch_size=batch_size, 
-        shuffle=True,
-        num_workers=nworkers,
-        collate_fn=pad_batch_with_fixed_length
-    )
     valid_loader = DataLoader(
         SeqDataset(valid_file, **config),
         batch_size=batch_size,
         shuffle=False,
         num_workers=nworkers,
         collate_fn=pad_batch_with_fixed_length,
+    )
+    
+    if train_swaps > 0:
+        config["train_noise"] = True
+        config["test_noise"] = False
+        config["swaps"] = train_swaps
+    train_loader = DataLoader(
+        SeqDataset(train_file, training=True, **config),
+        batch_size=batch_size, 
+        shuffle=True,
+        num_workers=nworkers,
+        collate_fn=pad_batch_with_fixed_length
     )
 
     net = seq2seq(train_len=len(train_loader), **config)  
@@ -201,17 +201,15 @@ def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, ver
         
  
     
-def test(test_file, model_weights=None, output_file=None, swaps=0, config={}, nworkers=2, verbose=True):
+def test(test_file, model_weights=None, output_file=None, test_swaps=0, config={}, nworkers=2, verbose=True):
     test_file = test_file
     test_file = validate_file(test_file)
     if verbose not in config:
         config["verbose"] = verbose
-    
-    config["noise"] = False
-    if swaps > 0:
-        config["noise"] = True 
-    
-    # pad_batch_with_fixed_length = partial(pad_batch, fixed_length=args.max_len) 
+    if test_swaps > 0:
+        config["test_noise"] = True
+        config["swaps"] = test_swaps
+        
     pad_batch_with_fixed_length = partial(pad_batch, fixed_length=128)
     test_loader = DataLoader(
         SeqDataset(test_file, **config),

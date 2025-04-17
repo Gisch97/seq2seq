@@ -1,14 +1,13 @@
 {
     "exp": "test0",
-    "run": "working_0",
+    "run": "train_noise0",
     "device": "cuda",
     "cache_path": "cache/",
     "batch_size": 64,
     "max_len": 128, 
-    "swaps": 0,
     "quiet": false,
     "nworkers": 4,
-    "max_epochs": 20,
+    "max_epochs": 40,
     "valid_split": 0.1,
     "verbose": true
 }
