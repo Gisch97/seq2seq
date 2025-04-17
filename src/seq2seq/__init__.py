@@ -16,7 +16,6 @@ from .dataset import SeqDataset, pad_batch
 from .model.unet import seq2seq 
 from .embeddings import NT_DICT
 from .parser import parser, get_parser_defaults
-from .utils import write_ct,  ct2dot, dot2png, ct2svg
 from .utils import  validate_file, read_train_file, read_test_file, read_pred_file 
 
 def main():
@@ -240,7 +239,7 @@ def test(test_file, model_weights=None, output_file=None, swaps=0, config={}, nw
     if verbose:
         print(summary)
 
-def pred(pred_input, sequence_id='pred_id', model_weights=None, out_path=None, logits=False, config={}, nworkers=2, draw=False, draw_resolution=10, verbose=True):
+def pred(pred_input, sequence_id='pred_id', model_weights=None, out_path=None, logits=False, config={}, nworkers=2,  verbose=True):
     
     if out_path is None:
         output_format = "text"
@@ -290,40 +289,20 @@ def pred(pred_input, sequence_id='pred_id', model_weights=None, out_path=None, l
         print(f"Start prediction of {pred_file}")
 
     predictions, logits_list = net.pred(pred_loader, logits=logits)
-    if draw:
-        for i in range(len(predictions)):
-            item = predictions.iloc[i]
-            ctfile = "tmp.ct"
-            write_ct(ctfile, item.id, item.sequence, item.base_pairs)
-            dotbracket = ct2dot(ctfile)
-            
-            png_file = item.id +".png"
-            if out_path is not None and os.path.isdir(out_path):
-                png_file = os.path.join(out_path, png_file)
-            if dotbracket:
-                dot2png(png_file, item.sequence, dotbracket, resolution=draw_resolution)
-            ct2svg("tmp.ct", png_file.replace(".png", ".svg"))
-
+   
     if not file_input:
         os.remove(pred_file)
 
     if output_format == "text":
         for i in range(len(predictions)):
             item = predictions.iloc[i]
-            ctfile = "tmp.ct"
-            write_ct(ctfile, item.id, item.sequence, item.base_pairs)
-            dotbracket = ct2dot(ctfile)
             print(item.id)
             print(item.sequence)
-            print(dotbracket)
-            print()
     elif output_format == "csv":
         predictions.to_csv(out_path, index=False)
     else: # ct
         for i in range(len(predictions)):
             item = predictions.iloc[i]
-            write_ct(os.path.join(out_path, item.id +".ct"), item.id, item.sequence, item.base_pairs)
-    if logits:
         base = os.path.split(out_path)[0] if not os.path.isdir(out_path) else out_path
         if len(base) == 0:
             base = "."

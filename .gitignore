@@ -1,0 +1,6 @@
+cache/*
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*$py.class
