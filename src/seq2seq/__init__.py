@@ -1,5 +1,6 @@
 import json 
 import os
+import time
 import random
 import numpy as np
 import torch as tr
@@ -91,6 +92,9 @@ def main():
             pred(args.pred_file, model_weights=args.model_weights, out_path=args.out_path, logits=args.logits, config=final_config, nworkers=args.nworkers, draw=args.draw, draw_resolution=args.draw_resolution)    
  
 def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, train_swaps=0, verbose=True):
+    # -----------------------------------------
+    #   (1) Carga de datos y configuraciones
+    # -----------------------------------------
     if out_path is None:
         out_path = f"results_{str(datetime.today()).replace(' ', '-')}/"
     else:
@@ -139,27 +143,49 @@ def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, tra
         shuffle=True,
         num_workers=nworkers,
         collate_fn=pad_batch_with_fixed_length
-    )
-
-    net = seq2seq(train_len=len(train_loader), **config)  
-    mlflow.log_param("arc_num_params", sum(p.numel() for p in net.parameters()))
+    )    
+    # -----------------------------------------
+    #   (2) Inicio de entrenamiento
+    # -----------------------------------------
     
+    net = seq2seq(train_len=len(train_loader), **config)  
+    mlflow.log_param("arc_num_params", sum(p.numel() for p in net.parameters()))  
+      
     best_loss, patience_counter = np.inf, 0 
     patience = config["patience"] if "patience" in config else 30
-    if verbose:
-        print("Start training...")
     max_epochs = config["max_epochs"] if "max_epochs" in config else 1000
     logfile = os.path.join(out_path, "train_log.csv") 
+
+    if verbose:
+        print("Start training...")
     
     
-    for epoch in range(max_epochs):
+    for epoch in range(max_epochs): 
+        # --- Época: inicio ---
+        epoch_start = time.time()
+        
+        # --- Fase de entrenamiento ---
+        train_start = time.time()
         train_metrics = net.fit(train_loader)
+        train_duration = time.time() - train_start
+        mlflow.log_metric("train_time", train_duration, step=epoch)
+        
+        #  --- Registrar métricas de entrenamiento --- 
         for k, v in train_metrics.items(): 
             mlflow.log_metric(key=f"train_{k}", value=v, step=epoch)
+        
+        # --- Fase de validación ---
         val_metrics = net.test(valid_loader)
         for k, v in val_metrics.items():  
             mlflow.log_metric(key=f"valid_{k}", value=v, step=epoch)
+        
+          # --- Época: fin ---
+        epoch_duration = time.time() - epoch_start
+        mlflow.log_metric("epoch_time", epoch_duration, step=epoch)
 
+        # ------------------------------
+        # (3) Guardado de mejor modelo y paciencia
+        # ------------------------------
         if val_metrics["loss"] < best_loss:
             best_loss = val_metrics["loss"]
             tr.save(net.state_dict(), os.path.join(out_path, "weights.pmt"))
@@ -171,7 +197,9 @@ def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, tra
             patience_counter += 1
             if patience_counter > patience:
                 break
-    
+        # ------------------------------
+        # (4) Append CSV de log
+        # ------------------------------
         if not os.path.exists(logfile):
             with open(logfile, "w") as f: 
                 msg = ','.join(['epoch']+[f"train_{k}" for k in sorted(train_metrics.keys())]+[f"valid_{k}" for k in sorted(val_metrics.keys())]) + "\n"
@@ -187,7 +215,9 @@ def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, tra
             if verbose:
                 print(msg)
             
-    # remove temporal files           
+    # ------------------------------
+    # (5) Limpieza y loggeado final
+    # ------------------------------         
     shutil.rmtree(config["cache_path"], ignore_errors=True)
     
     tmp_file = os.path.join(out_path, "train.csv")

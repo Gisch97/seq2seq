@@ -1,6 +1,6 @@
 {
     "test_file": "data/ArchiveII/seq-similarity/test_0.csv",
-    "model_weights": "results/test0/weights.pmt",
-    "out_path": "results/test0/test_swaps04.csv",
+    "model_weights": "results/FlatNoise/Train_w_noise_0_1/nc_2_n4_3_n8_1_skip1_noise0.95/weights.pmt",
+    "out_path": "results/FlatNoise/Train_w_noise_0_1/nc_2_n4_3_n8_1_skip1_noise0.95/test.csv",
     "test_swaps": 0
 }

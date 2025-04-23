@@ -1,13 +1,13 @@
 {
-    "exp": "test0",
-    "run": "train_noise0",
+    "exp": "Train_w_noise_0_1",
+    "run": "nc_2_n4_3_n8_1_skip1_noise0.95",
     "device": "cuda",
     "cache_path": "cache/",
-    "batch_size": 64,
+    "batch_size": 16,
     "max_len": 128, 
     "quiet": false,
     "nworkers": 4,
-    "max_epochs": 40,
+    "max_epochs": 30,
     "valid_split": 0.1,
     "verbose": true
 }
