@@ -11,25 +11,25 @@ from ..metrics import compute_metrics
 from .._version import __version__
 
 
-def seq2seq(weights=None, **kwargs):
+def seq2motif(weights=None, **kwargs):
     """
-    seq2seq: a deep learning-based autoencoder for RNA sequence to sequence prediction.
+    seq2motif: a deep learning-based autoencoder for RNA sequence connections predictions.
     weights (str): Path to weights file
     **kwargs: Model hyperparameters
     """
 
-    model = Seq2Seq(**kwargs)
+    model = Seq2Motif(**kwargs)
     if weights is not None:
         print(f"Load weights from {weights}")
         model.load_state_dict(tr.load(weights, map_location=tr.device(model.device)))
     else:
         print("No weights provided, using random initialization")
     model.log_model()
-    mlflow.set_tag("model", "Unet")
+    mlflow.set_tag("model", "seq2motif-pseudo_probing")
     return model
 
 
-class Seq2Seq(nn.Module):
+class Seq2Motif(nn.Module):
     def __init__(
         self,
         train_len=0,
@@ -88,7 +88,7 @@ class Seq2Seq(nn.Module):
         features=[4, 8, 16, 32, 64],
         **kwargs,
     ):
-
+        
         features = [4]
         n_4=3
         n_8=2
@@ -101,11 +101,11 @@ class Seq2Seq(nn.Module):
         encoder_blocks = len(features) - 1
         self.L_min = 128 // ((2**encoder_blocks))
         volume = [(128 / 2**i) * f for i, f in enumerate(features)]
-
+        self.out_dim = 1
         self.architecture = {
             "arc_embedding_dim": embedding_dim,
             "arc_encoder_blocks": encoder_blocks,
-            "arc_initial_volume": embedding_dim * 128,
+            "arc_initial_volume": 4 * 128,
             "arc_latent_volume": volume[-1],
             "arc_features": features,
             "arc_num_conv": num_conv,
@@ -140,7 +140,7 @@ class Seq2Seq(nn.Module):
                 for i in range(len(rev_features) - 1)
             ]
         )
-        self.outc = OutConv(features[0], embedding_dim)
+        self.outc = OutConv(features[0], self.out_dim)
 
     def forward(self, x):
         x = x.to(self.device)
@@ -156,16 +156,15 @@ class Seq2Seq(nn.Module):
         for up, skip in zip(self.up, skips):
             x = up(x, skip)
 
-        x_rec = self.outc(x)
+        y_pred = self.outc(x)
 
-        return x_rec, x_latent
+        return y_pred, x_latent
 
-    def loss_func(self, x_rec, x):
+    def loss_func(self, y_pred, y):
         """yhat and y are [N, L]"""
-        x = x.view(x.shape[0], -1)
-        x_rec = x_rec.view(x_rec.shape[0], -1)
-        recon_loss = mse_loss(x_rec, x)
-        return recon_loss
+        y = y.view(y.shape[0], -1)
+        y_pred = y_pred.view(y_pred.shape[0], -1)
+        return mse_loss(y_pred, y)
 
     def fit(self, loader):
         self.train()
@@ -173,21 +172,21 @@ class Seq2Seq(nn.Module):
         metrics = {"loss": 0, "F1": 0, "Accuracy": 0, "Accuracy_seq": 0}
         if self.verbose:
             loader = tqdm(loader)
-
-        emb = "embedding"
-        if self.train_noise == True:
-            emb = "embedding_with_noise"
+ 
         for batch in loader:
-            x = batch["embedding"].to(self.device)
-            x_model = batch[emb].to(self.device)         
+            y = batch["pseudo_probing"].to(self.device)
+            x_model = batch['embedding'].to(self.device)         
             mask = batch["mask"].to(self.device) 
             
             self.optimizer.zero_grad()  # Cleaning cache optimizer
-            x_rec, _ = self(x_model)
-            loss = self.loss_func(x_rec, x)
+            y_pred, _ = self(x_model)
+            loss = self.loss_func(y_pred, y)
             metrics["loss"] += loss.item()
 
-            batch_metrics = compute_metrics(x_rec, x, mask)
+            loss_stem = self.loss_func(y_pred, batch["stem"].to(self.device))
+            metrics["loss"] += loss.item()
+
+            batch_metrics = compute_metrics(y_pred, y, mask, binary=True)
             for k, v in batch_metrics.items():
                 metrics[k] += v
 
@@ -210,19 +209,16 @@ class Seq2Seq(nn.Module):
         if self.verbose:
             loader = tqdm(loader)
 
-        emb= "embedding"
-        if self.test_noise == True:
-            emb ="embedding_with_noise"
         with tr.no_grad():
             for batch in loader:
-                x = batch["embedding"].to(self.device)
-                x_model = batch[emb].to(self.device)
+                y = batch["pseudo_probing"].to(self.device)
+                x_model = batch["embedding"].to(self.device)
                 mask = batch["mask"].to(self.device) 
 
-                x_rec, z = self(x_model)
-                loss = self.loss_func(x_rec, x)
+                y_pred, z = self(x_model)
+                loss = self.loss_func(y_pred, y)
                 metrics["loss"] += loss.item()
-                batch_metrics = compute_metrics(x_rec, x, mask)
+                batch_metrics = compute_metrics(y_pred, y, mask, binary=True)
                 
                 
                 
@@ -248,9 +244,11 @@ class Seq2Seq(nn.Module):
                 embedding = batch["embedding"]
                 sequences = batch["sequence"]
                 lengths = batch["length"]
-                x_rec, z = self(embedding)
+                pseudo_probing = batch["pseudo_probing"],
+                motif_emb = batch["motif_emb"],      
+                y_pred, z = self(embedding)
 
-                for k in range(x_rec.shape[0]):
+                for k in range(y_pred.shape[0]):
                     seq_len = lengths[k]
 
                     predictions.append(
@@ -259,7 +257,9 @@ class Seq2Seq(nn.Module):
                             sequences[k],
                             seq_len,
                             embedding[k, :, :seq_len].cpu().numpy(),
-                            x_rec[k, :, :seq_len].cpu().numpy(),
+                            pseudo_probing[k, :, :seq_len].cpu().numpy(),
+                            motif_emb[k, :, :seq_len].cpu().numpy(),
+                            y_pred[k, :, :seq_len].cpu().numpy(),
                             z[k].cpu().numpy(),
                         )
                     )
@@ -271,7 +271,9 @@ class Seq2Seq(nn.Module):
                 "sequence",
                 "length",
                 "embedding",
-                "reconstructed",
+                "pseudo_probing",
+                "motif_emb",
+                "connection_pred",
                 "latent",
             ],
         )

@@ -1,6 +1,6 @@
 import torch as tr 
 
-def compute_metrics(x_rec, x_true, mask):
+def compute_metrics(x_rec, x_true, mask, binary=False):
     """
     Calculates the F1 score, accuracy (sequence level and threshold),
     precision, recall, and perplexity.
@@ -14,15 +14,19 @@ def compute_metrics(x_rec, x_true, mask):
         dict: Calculated metrics.
     """
     xt_rec = x_rec.permute(0,2,1)
-    xt_true = x_true.permute(0,2,1) 
+    xt_true = x_true.permute(0,2,1)
 
     # Obtener el índice de la clase predicha y verdadera
     pred_idx = xt_rec.argmax(dim=-1)   # [B, L]
     true_idx = xt_true.argmax(dim=-1)  # [B, L]
- 
-    pred_flat = pred_idx[mask]    
-    true_flat = true_idx[mask]
- 
+    
+    if binary == False:
+        pred_flat = pred_idx[mask]
+        true_flat = true_idx[mask]
+    else:
+        pred_flat = xt_rec[mask]
+        true_flat = xt_true[mask]
+    
     TP = (pred_flat == true_flat).sum().item()    
     
     total = mask.sum().item()

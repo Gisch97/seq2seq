@@ -13,7 +13,7 @@ import mlflow.pytorch
 
 from torch.utils.data import DataLoader
 from .dataset import SeqDataset, pad_batch
-from .model.unet import seq2seq 
+from .model.unet import seq2motif 
 from .embeddings import NT_DICT
 from .parser import parser, get_parser_defaults
 from .utils import  validate_file, read_train_file, read_test_file, read_pred_file 
@@ -141,7 +141,7 @@ def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, tra
         collate_fn=pad_batch_with_fixed_length
     )
 
-    net = seq2seq(train_len=len(train_loader), **config)  
+    net = seq2motif(train_len=len(train_loader), **config)  
     mlflow.log_param("arc_num_params", sum(p.numel() for p in net.parameters()))
     
     best_loss, patience_counter = np.inf, 0 
@@ -219,9 +219,9 @@ def test(test_file, model_weights=None, output_file=None, test_swaps=0, config={
         collate_fn=pad_batch_with_fixed_length,
     )
     if model_weights is not None:
-        net = seq2seq(weights=model_weights, **config)
+        net = seq2motif(weights=model_weights, **config)
     else:
-        net = seq2seq(pretrained=True, **config)
+        net = seq2motif(pretrained=True, **config)
     
     mlflow.log_param("arc_num_params", sum(p.numel() for p in net.parameters()))
     if verbose:
@@ -279,9 +279,9 @@ def pred(pred_input, sequence_id='pred_id', model_weights=None, out_path=None, l
     
     if model_weights is not None:
         weights = model_weights
-        net = seq2seq(weights=weights, **config)
+        net = seq2motif(weights=weights, **config)
     else:
-        net = seq2seq(pretrained=True, **config)
+        net = seq2motif(pretrained=True, **config)
 
     if verbose:        
         print(f"Start prediction of {pred_file}")
