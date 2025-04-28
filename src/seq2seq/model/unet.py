@@ -90,8 +90,8 @@ class Seq2Motif(nn.Module):
     ):
         
         features = [4]
-        n_4=3
-        n_8=2
+        n_4=2
+        n_8=1
         for _ in range(n_4):
             features.append(4)
         for _ in range(n_8):
@@ -156,7 +156,7 @@ class Seq2Motif(nn.Module):
         for up, skip in zip(self.up, skips):
             x = up(x, skip)
 
-        y_pred = self.outc(x)
+        y_pred = tr.sigmoid(self.outc(x))
 
         return y_pred, x_latent
 
@@ -180,7 +180,8 @@ class Seq2Motif(nn.Module):
             
             self.optimizer.zero_grad()  # Cleaning cache optimizer
             y_pred, _ = self(x_model)
-            
+            print(y_pred)
+            print(y)
             loss = self.loss_func(y_pred, y)
             metrics["loss"] += loss.item()
 

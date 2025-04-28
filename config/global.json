@@ -1,6 +1,6 @@
 {
-    "exp": "test0",
-    "run": "train_noise0",
+    "exp": "Test0",
+    "run": "pseudop_nc_2_n4_2_n8_1_skip1",
     "device": "cuda",
     "cache_path": "cache/",
     "batch_size": 64,
