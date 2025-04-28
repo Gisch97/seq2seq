@@ -131,7 +131,6 @@ def train(train_file, config={}, out_path=None, valid_file=None, nworkers=2, tra
     
     if train_swaps > 0:
         config["train_noise"] = True
-        config["test_noise"] = False
         config["swaps"] = train_swaps
     train_loader = DataLoader(
         SeqDataset(train_file, training=True, **config),

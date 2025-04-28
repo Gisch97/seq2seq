@@ -180,10 +180,8 @@ class Seq2Motif(nn.Module):
             
             self.optimizer.zero_grad()  # Cleaning cache optimizer
             y_pred, _ = self(x_model)
+            
             loss = self.loss_func(y_pred, y)
-            metrics["loss"] += loss.item()
-
-            loss_stem = self.loss_func(y_pred, batch["stem"].to(self.device))
             metrics["loss"] += loss.item()
 
             batch_metrics = compute_metrics(y_pred, y, mask, binary=True)

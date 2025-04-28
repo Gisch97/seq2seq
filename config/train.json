@@ -3,5 +3,5 @@
     "train_file": "data/ArchiveII/seq-similarity/train_0.csv",
     "valid_file": "data/ArchiveII/seq-similarity/valid_0.csv",
     "out_path": "results/testnoise03b64-2",
-    "train_swaps": 0.3
+    "train_swaps": 0
 }
