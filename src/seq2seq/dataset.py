@@ -90,9 +90,9 @@ def pad_batch(batch, fixed_length=0):
     if fixed_length == 0:
         fixed_length = max(L)
     embedding_pad = tr.zeros((len(batch), batch[0]["embedding"].shape[0], fixed_length))
-    pseudo_probing_pad = tr.zeros((len(batch), batch[0]["pseudo_probing"].shape[0], fixed_length))
-    stem_pad = tr.zeros((len(batch), batch[0]["stem"].shape[0], fixed_length))
-    motif_emb_pad = tr.zeros((len(batch), batch[0]["motif_emb"].shape[0], fixed_length))
+    pseudo_probing_pad = tr.zeros((len(batch), batch[0]["pseudo_probing"].shape[0], fixed_length), dtype=tr.float)
+    stem_pad = tr.zeros((len(batch), batch[0]["stem"].shape[0], fixed_length), dtype=tr.float)
+    motif_emb_pad = tr.zeros((len(batch), batch[0]["motif_emb"].shape[0], fixed_length), dtype=tr.float)
     mask = tr.zeros((len(batch), fixed_length), dtype=tr.bool)
 
     for k in range(len(batch)):

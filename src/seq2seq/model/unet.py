@@ -156,7 +156,7 @@ class Seq2Motif(nn.Module):
         for up, skip in zip(self.up, skips):
             x = up(x, skip)
 
-        y_pred = tr.sigmoid(self.outc(x))
+        y_pred = self.outc(x)
 
         return y_pred, x_latent
 
@@ -164,7 +164,7 @@ class Seq2Motif(nn.Module):
         """yhat and y are [N, L]"""
         y = y.view(y.shape[0], -1)
         y_pred = y_pred.view(y_pred.shape[0], -1)
-        return mse_loss(y_pred, y)
+        return cross_entropy(y_pred, y)
 
     def fit(self, loader):
         self.train()
