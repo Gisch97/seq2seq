@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### EXPERIMENTO Y MODELOS SELECCIONADOS
-EXPERIMENT_NAME="Test0"
+EXPERIMENT_NAME="pseudop_0"
 MODEL_NAME="unet"
 
 # File paths
@@ -13,17 +13,11 @@ MODEL_FILE="$MODEL_PATH/$MODEL_NAME.py"
 BASE_OUTPUT_PATH="results/test0/$EXPERIMENT_NAME"
 mkdir -p "$BASE_OUTPUT_PATH"
 
-# Hyperparameters 
-num_conv=(2)
-n_8=(1)
-n_4=(2)
-skip=(1)
-
 # # Hyperparameters 
-# num_conv=(1 2)
-# n_8=(0 1)
-# n_4=(0 1 2 3)
-# skip=(0 1)
+num_conv=(1 2)
+n_8=(0 1)
+n_4=(0 1 2 3)
+skip=(0 1)
 
 ### LOGGING de la ejecución
 cp fold_it.sh "$BASE_OUTPUT_PATH"

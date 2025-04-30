@@ -7,7 +7,7 @@
     "max_len": 128, 
     "quiet": false,
     "nworkers": 4,
-    "max_epochs": 40,
+    "max_epochs": 50,
     "valid_split": 0.1,
     "verbose": true
 }

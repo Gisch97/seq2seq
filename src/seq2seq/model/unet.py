@@ -156,7 +156,7 @@ class Seq2Motif(nn.Module):
         for up, skip in zip(self.up, skips):
             x = up(x, skip)
 
-        y_pred = self.outc(x)
+        y_pred = nn.Sigmoid()(self.outc(x))      
 
         return y_pred, x_latent
 
@@ -164,7 +164,7 @@ class Seq2Motif(nn.Module):
         """yhat and y are [N, L]"""
         y = y.view(y.shape[0], -1)
         y_pred = y_pred.view(y_pred.shape[0], -1)
-        return cross_entropy(y_pred, y)
+        return mse_loss(y_pred, y)
 
     def fit(self, loader):
         self.train()
@@ -179,9 +179,7 @@ class Seq2Motif(nn.Module):
             mask = batch["mask"].to(self.device) 
             
             self.optimizer.zero_grad()  # Cleaning cache optimizer
-            y_pred, _ = self(x_model)
-            print(y_pred)
-            print(y)
+            y_pred, _ = self(x_model) 
             loss = self.loss_func(y_pred, y)
             metrics["loss"] += loss.item()
 
