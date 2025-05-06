@@ -90,7 +90,7 @@ class Seq2Motif(nn.Module):
     ):
         
         features = [4]
-        n_4=2
+        n_4=3
         n_8=1
         for _ in range(n_4):
             features.append(4)
