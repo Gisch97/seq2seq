@@ -15,8 +15,8 @@ mkdir -p "$BASE_OUTPUT_PATH"
 
 # # Hyperparameters 
 num_conv=(1 2)
-n_8=(0 1)
-n_4=(0 1 2 3)
+n_4=(0 1 2)
+n_8=(2 3)
 skip=(0 1)
 
 ### LOGGING de la ejecución

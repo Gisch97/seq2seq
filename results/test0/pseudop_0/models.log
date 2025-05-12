@@ -1,11 +1,11 @@
-# Starting experiment -- pseudop_0 -- at mié 30 abr 2025 19:02:42 -03
-Saving hyperparameters: num_conv = 1 2, n_4 = 0 1 2 3, n_8 = 0 1, skip = 0 1
+# Starting experiment -- pseudop_0 -- at lun 12 may 2025 16:58:53 -03
+Saving hyperparameters: num_conv = 1 2, n_4 = 0 1 2, n_8 = 2 3, skip = 0 1
 # Config train #
 {
 
     "train_file": "data/ArchiveII/ArchiveII_seq_sim_pp_motifs/train_0.csv",
     "valid_file": "data/ArchiveII/ArchiveII_seq_sim_pp_motifs/valid_0.csv",
-    "out_path": "results/test0/pseudop_0/pseudop_nc_1_n4_0_n8_0_skip1",
+    "out_path": "results/test0/pseudop_0/pseudop_nc_1_n4_0_n8_0_skip0",
     "train_swaps": 0
 }# Config test #
 {
@@ -100,7 +100,7 @@ class Seq2Motif(nn.Module):
         num_conv=1,
         pool_mode="max",
         up_mode="upsample",
-        skip=1,
+        skip=0,
         addition="cat",
         features=[4, 8, 16, 32, 64],
         **kwargs,
