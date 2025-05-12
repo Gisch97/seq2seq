@@ -1,6 +1,6 @@
 {
     "exp": "pseudop_0",
-    "run": "pseudop_nc_2_n4_3_n8_1_skip1",
+    "run": "pseudop_baseline_skip0",
     "device": "cuda",
     "cache_path": "cache/",
     "batch_size": 64,
