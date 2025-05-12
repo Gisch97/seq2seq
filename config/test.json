@@ -1,6 +1,6 @@
 {
     "test_file": "data/ArchiveII/ArchiveII_seq_sim_pp_motifs/test_0.csv",
-    "model_weights": "results/test0/pseudop_0/pseudop_nc_2_n4_2_n8_3_skip1/weights.pmt",
-    "out_path": "results/test0/pseudop_0/pseudop_nc_2_n4_2_n8_3_skip1/test.csv",
+    "model_weights": "results/test0/pseudop_0/pseudop_nc_2_n8_1_n16_2_skip1/weights.pmt",
+    "out_path": "results/test0/pseudop_0/pseudop_nc_2_n8_1_n16_2_skip1/test.csv",
     "test_swaps": 0
 }

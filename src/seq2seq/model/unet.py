@@ -89,13 +89,13 @@ class Seq2Motif(nn.Module):
         **kwargs,
     ):
         
-        features = [4]
-        n_4=2
-        n_8=3
-        for _ in range(n_4):
-            features.append(4)
-        for _ in range(n_8):
+        features = [4,8]
+        n_16=2
+        n_16=2
+        for _ in range(n_16):
             features.append(8)
+        for _ in range(n_16):
+            features.append(16)
 
         rev_features = features[::-1]
         encoder_blocks = len(features) - 1

@@ -15,8 +15,8 @@ mkdir -p "$BASE_OUTPUT_PATH"
 
 # # Hyperparameters 
 num_conv=(1 2)
-n_4=(0 1 2)
-n_8=(2 3)
+n_8=(0 1)
+n_16=(0 1 2)
 skip=(0 1)
 
 ### LOGGING de la ejecución
@@ -24,8 +24,8 @@ cp fold_it.sh "$BASE_OUTPUT_PATH"
 echo "# Starting experiment -- $EXPERIMENT_NAME -- at $(date)" > "$BASE_OUTPUT_PATH/models.log"
 echo "Saving hyperparameters:" \
      "num_conv = ${num_conv[@]}," \
-     "n_4 = ${n_4[@]}," \
      "n_8 = ${n_8[@]}," \
+     "n_16 = ${n_16[@]}," \
      "skip = ${skip[@]}" | tee -a "$BASE_OUTPUT_PATH/models.log"
  
 echo "# Config train #" >> "$BASE_OUTPUT_PATH/models.log"
@@ -42,18 +42,18 @@ sed -i "s/\"exp\": \"[^\"]*\"/\"exp\": \"$EXPERIMENT_NAME\"/" "$GLOBAL_CONFIG"
 
 # Bucle para iterar sobre las configuraciones
 for nc in "${num_conv[@]}"; do
-    for nc_8 in "${n_8[@]}"; do
-        for nc_4 in "${n_4[@]}"; do
+    for nc_16 in "${n_16[@]}"; do
+        for nc_8 in "${n_8[@]}"; do
             for s in "${skip[@]}"; do
                 echo "########################################################################"
-                save_name="pseudop_nc_${nc}_n4_${nc_4}_n8_${nc_8}_skip${s}"
+                save_name="pseudop_nc_${nc}_n8_${nc_8}_n16_${nc_16}_skip${s}"
                 echo "Ejecutando: $save_name"
                 # # Modificar la configuración del modelo para pool, up y skip
                 sed -i \
                     -e "83s/\(num_conv=\)[0-9e.-]*/num_conv=$nc/" \
                     -e "86s/\(skip=\)[0-9e.-]*/skip=$s/" \
-                    -e "93s/n_4=[0-9e.-]*/n_4=$nc_4/" \
-                    -e "94s/n_8=[0-9e.-]*/n_8=$nc_8/" \
+                    -e "93s/n_8=[0-9e.-]*/n_8=$nc_8/" \
+                    -e "94s/n_16=[0-9e.-]*/n_16=$nc_16/" \
                     "$MODEL_FILE"
                 bash scripts/train_test.sh "$BASE_OUTPUT_PATH" "$save_name" 
             done

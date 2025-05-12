@@ -1,17 +1,17 @@
-# Starting experiment -- pseudop_0 -- at lun 12 may 2025 16:58:53 -03
-Saving hyperparameters: num_conv = 1 2, n_4 = 0 1 2, n_8 = 2 3, skip = 0 1
+# Starting experiment -- pseudop_0 -- at lun 12 may 2025 18:07:30 -03
+Saving hyperparameters: num_conv = 1 2, n_8 = 0 1, n_16 = 0 1 2, skip = 0 1
 # Config train #
 {
 
     "train_file": "data/ArchiveII/ArchiveII_seq_sim_pp_motifs/train_0.csv",
     "valid_file": "data/ArchiveII/ArchiveII_seq_sim_pp_motifs/valid_0.csv",
-    "out_path": "results/test0/pseudop_0/pseudop_nc_1_n4_0_n8_0_skip0",
+    "out_path": "results/test0/pseudop_0/pseudop_nc_2_n4_1_n8_2_skip1",
     "train_swaps": 0
 }# Config test #
 {
     "test_file": "data/ArchiveII/ArchiveII_seq_sim_pp_motifs/test_0.csv",
-    "model_weights": "results/test0/pseudop_0/pseudop_nc_1_n4_0_n8_0_skip0/weights.pmt",
-    "out_path": "results/test0/pseudop_0/pseudop_nc_1_n4_0_n8_0_skip0/test.csv",
+    "model_weights": "results/test0/pseudop_0/pseudop_nc_2_n4_1_n8_2_skip1/weights.pmt",
+    "out_path": "results/test0/pseudop_0/pseudop_nc_2_n4_1_n8_2_skip1/test.csv",
     "test_swaps": 0
 }# Guardando contenido del archivo del modelo: src/seq2seq/model/unet.py
 # Contenido del modelo:
@@ -97,22 +97,22 @@ class Seq2Motif(nn.Module):
     def build_graph(
         self,
         embedding_dim=4,
-        num_conv=1,
+        num_conv=2,
         pool_mode="max",
         up_mode="upsample",
-        skip=0,
+        skip=1,
         addition="cat",
         features=[4, 8, 16, 32, 64],
         **kwargs,
     ):
         
-        features = [4]
-        n_4=0
-        n_8=0
-        for _ in range(n_4):
-            features.append(4)
-        for _ in range(n_8):
+        features = [4,8]
+        n_16=2
+        n_16=2
+        for _ in range(n_16):
             features.append(8)
+        for _ in range(n_16):
+            features.append(16)
 
         rev_features = features[::-1]
         encoder_blocks = len(features) - 1
