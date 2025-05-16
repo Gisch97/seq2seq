@@ -24,8 +24,8 @@ def seq2seq(weights=None, **kwargs):
         model.load_state_dict(tr.load(weights, map_location=tr.device(model.device)))
     else:
         print("No weights provided, using random initialization")
-    model.log_model()
-    mlflow.set_tag("model", "Unet")
+    # model.log_model()
+    # mlflow.set_tag("model", "Unet")
     return model
 
 
