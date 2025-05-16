@@ -1,13 +1,13 @@
 {
-    "exp": "test0",
-    "run": "train_noise0",
+    "exp": "model_4_8_skip0_Optim_lr_avg_traspose",
+    "run": "nc2-lr-1e-1-iter5",
     "device": "cuda",
     "cache_path": "cache/",
     "batch_size": 64,
     "max_len": 128, 
     "quiet": false,
     "nworkers": 4,
-    "max_epochs": 40,
+    "max_epochs": 150,
     "valid_split": 0.1,
     "verbose": true
 }

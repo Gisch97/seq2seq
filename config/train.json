@@ -2,6 +2,6 @@
 
     "train_file": "data/ArchiveII/seq-similarity/train_0.csv",
     "valid_file": "data/ArchiveII/seq-similarity/valid_0.csv",
-    "out_path": "results/testnoise03b64-2",
-    "train_swaps": 0.3
+    "out_path": "results/model_4_8/model_4_8_skip0_Optim_lr_avg_traspose/nc2-lr-1e-1-iter5",
+    "train_swaps": 0
 }

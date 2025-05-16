@@ -3,7 +3,7 @@
 # Configuración de hiperparámetros para las pruebas
 latent_dims=(12 16 20 32 64)
 negative_weights=(0.1 0.2 0.5)
-learning_rates=(1e-4 1e-3 1e-2)
+learning_rates=(1e-3 5e-3 1e-2 5e-2)
 schedulers=("none" "cosine" "linear")
 interaction_priors=("False" "True")
 output_thresholds=(0.5 0.7)

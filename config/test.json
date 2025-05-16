@@ -1,6 +1,6 @@
 {
     "test_file": "data/ArchiveII/seq-similarity/test_0.csv",
-    "model_weights": "results/test0/weights.pmt",
-    "out_path": "results/test0/test_swaps04.csv",
+    "model_weights": "results/model_4_8/model_4_8_skip0_Optim_lr_avg_traspose/nc2-lr-1e-1-iter5/weights.pmt",
+    "out_path": "results/model_4_8/model_4_8_skip0_Optim_lr_avg_traspose/nc2-lr-1e-1-iter5/test.csv",
     "test_swaps": 0
 }
